@@ -1,6 +1,5 @@
 import { perfumesMock } from '../data/perfumes.mock'
 import { perfumeImageUrl, resolveBrand } from '../utils/brandResolver'
-import { getAverageSellingRate } from './exchangeRateService'
 import { buildFragranceProfile } from '../utils/fragranceProfile'
 
 const truthy = (value) => ['true', '1', 'sí', 'si', 'x'].includes(String(value ?? '').trim().toLowerCase())
@@ -73,10 +72,5 @@ export async function getPerfumes() {
   const response = await fetch(url, { signal: AbortSignal.timeout(8000) })
   if (!response.ok) throw new Error('No se pudo cargar el catálogo')
   const perfumes = csvToRows(await response.text()).map(normalizeRow).filter((perfume) => perfume.name)
-  const rateResult = await getAverageSellingRate().catch(() => null)
-  if (!rateResult) return perfumes
-  return perfumes.map((perfume) => ({
-    ...perfume,
-    priceArs: Math.round((perfume.priceUsd * rateResult) / 1000) * 1000,
-  }))
+  return perfumes
 }
