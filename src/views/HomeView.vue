@@ -17,7 +17,6 @@ import InstagramSection from '../components/InstagramSection.vue'
 import BackToTop from '../components/BackToTop.vue'
 import CompareDrawer from '../components/CompareDrawer.vue'
 import RecentlyViewed from '../components/RecentlyViewed.vue'
-import AdminPanel from '../components/AdminPanel.vue'
 import PwaControls from '../components/PwaControls.vue'
 import ExtrasHub from '../components/ExtrasHub.vue'
 import Footer from '../components/Footer.vue'
@@ -42,7 +41,6 @@ const cartOpen = ref(false)
 const cartPulse = ref(0)
 const recommenderOpen = ref(false)
 const compareOpen = ref(false)
-const adminOpen = ref(false)
 const cart = ref(JSON.parse(localStorage.getItem('gangas-cart') || '[]'))
 const favoriteIds = ref(JSON.parse(localStorage.getItem('gangas-favorites') || '[]'))
 const compareItems = ref(JSON.parse(localStorage.getItem('gangas-compare') || '[]'))
@@ -136,7 +134,6 @@ const retry = () => globalThis.location.reload()
         <PwaControls />
         <InstagramSection />
         <AboutFaq />
-        <button class="mb-10 text-xs text-zinc-700 hover:text-gold-300" @click="adminOpen = true">Administrar catálogo</button>
       </div>
     </main>
     <Footer />
@@ -145,7 +142,6 @@ const retry = () => globalThis.location.reload()
     <RecommenderQuiz :open="recommenderOpen" :perfumes="perfumes" @close="recommenderOpen = false" @add="addToCart" @detail="selectedPerfume = $event; recommenderOpen = false" />
     <button v-if="compareItems.length" class="fixed bottom-5 left-5 z-40 rounded-full border border-gold-400 bg-panel px-5 py-4 text-sm font-bold text-gold-300 shadow-2xl" @click="compareOpen = true">Comparar {{ compareItems.length }}</button>
     <CompareDrawer :open="compareOpen" :items="compareItems" @close="compareOpen = false" @remove="compareItems = compareItems.filter(item => item.id !== $event)" @detail="selectedPerfume = $event; compareOpen = false" />
-    <AdminPanel :open="adminOpen" :perfumes="perfumes" @close="adminOpen = false" />
     <BackToTop />
   </div>
 </template>
