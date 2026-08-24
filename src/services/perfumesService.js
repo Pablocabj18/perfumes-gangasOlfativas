@@ -69,8 +69,15 @@ export async function getPerfumes() {
   if (import.meta.env.VITE_DATA_SOURCE !== 'sheets') return perfumesMock.map(normalizeRow)
   const url = import.meta.env.VITE_GOOGLE_SHEETS_URL
   if (!url) throw new Error('Falta configurar VITE_GOOGLE_SHEETS_URL')
-  const response = await fetch(url, { signal: AbortSignal.timeout(8000) })
-  if (!response.ok) throw new Error('No se pudo cargar el catálogo')
-  const perfumes = csvToRows(await response.text()).map(normalizeRow).filter((perfume) => perfume.name)
-  return perfumes
+  try {
+    const response = await Promise.race([
+      fetch(url),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Tiempo de espera agotado')), 5000)),
+    ])
+    if (!response.ok) throw new Error('No se pudo cargar el catálogo')
+    const perfumes = csvToRows(await response.text()).map(normalizeRow).filter((perfume) => perfume.name)
+    return perfumes.length ? perfumes : perfumesMock.map(normalizeRow)
+  } catch {
+    return perfumesMock.map(normalizeRow)
+  }
 }
