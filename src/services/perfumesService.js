@@ -70,12 +70,10 @@ export async function getPerfumes() {
   if (import.meta.env.VITE_DATA_SOURCE !== 'sheets') return perfumesMock.map(normalizeRow)
   const url = import.meta.env.VITE_GOOGLE_SHEETS_URL
   if (!url) throw new Error('Falta configurar VITE_GOOGLE_SHEETS_URL')
-  const [response, rateResult] = await Promise.all([
-    fetch(url),
-    getAverageSellingRate().catch(() => null),
-  ])
+  const response = await fetch(url, { signal: AbortSignal.timeout(8000) })
   if (!response.ok) throw new Error('No se pudo cargar el catálogo')
   const perfumes = csvToRows(await response.text()).map(normalizeRow).filter((perfume) => perfume.name)
+  const rateResult = await getAverageSellingRate().catch(() => null)
   if (!rateResult) return perfumes
   return perfumes.map((perfume) => ({
     ...perfume,
