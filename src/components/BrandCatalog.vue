@@ -12,7 +12,7 @@ const groups = computed(() => Object.entries(props.perfumes.reduce((result, perf
 
 <template>
   <div v-if="groups.length" class="space-y-14">
-    <section v-for="([brand, items]) in groups" :key="brand">
+    <section v-for="([brand, items]) in groups" :key="brand" data-brand-section :data-brand="brand" class="scroll-mt-40">
       <div class="mb-5 flex items-end justify-between border-b border-white/10 pb-3">
         <h3 class="font-display text-3xl font-semibold text-white">{{ brand }}</h3>
         <span class="text-xs text-zinc-500">{{ items.length }} {{ items.length === 1 ? 'perfume' : 'perfumes' }}</span>

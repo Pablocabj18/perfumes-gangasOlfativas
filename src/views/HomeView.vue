@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import Header from '../components/Header.vue'
 import PromoBanner from '../components/PromoBanner.vue'
 import Hero from '../components/Hero.vue'
@@ -59,6 +59,12 @@ watch(compareItems, (value) => localStorage.setItem('gangas-compare', JSON.strin
 watch(recentIds, (value) => localStorage.setItem('gangas-recent', JSON.stringify(value)), { deep: true })
 watch(selectedPerfume, (perfume) => { if (perfume) recentIds.value = [perfume.id, ...recentIds.value.filter((id) => id !== perfume.id)].slice(0, 4) })
 watch([search, category, gender, brand, size, note, sort, maxPrice, favoritesOnly], () => { visibleCount.value = 12 })
+watch(brand, async (value) => {
+  if (value === 'Todas') return
+  await nextTick()
+  const section = [...document.querySelectorAll('[data-brand-section]')].find((item) => item.dataset.brand === value)
+  ;(section || document.querySelector('#catalogo'))?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+})
 
 const brands = computed(() => [...new Set(perfumes.value.map((p) => p.brand))].sort((a, b) => a.localeCompare(b, 'es')))
 const filtered = computed(() => {
@@ -98,7 +104,7 @@ function changeQuantity(id, amount) {
 function removeFromCart(id) { cart.value = cart.value.filter((entry) => entry.perfume.id !== id) }
 function toggleFavorite(id) { favoriteIds.value = favoriteIds.value.includes(id) ? favoriteIds.value.filter((item) => item !== id) : [...favoriteIds.value, id] }
 function toggleCompare(perfume) { if (compareItems.value.some((item) => item.id === perfume.id)) compareItems.value = compareItems.value.filter((item) => item.id !== perfume.id); else if (compareItems.value.length < 3) compareItems.value.push(perfume); compareOpen.value = true }
-function selectBrand(value) { brand.value = value; location.hash = 'catalogo' }
+function selectBrand(value) { brand.value = value }
 function openRecoveredCart() { recoveredCart.value = false; cartOpen.value = true }
 const relatedPerfumes = computed(() => selectedPerfume.value ? perfumes.value.filter((item) => item.id !== selectedPerfume.value.id && (item.brand === selectedPerfume.value.brand || item.style === selectedPerfume.value.style)).slice(0, 4) : [])
 const retry = () => globalThis.location.reload()
