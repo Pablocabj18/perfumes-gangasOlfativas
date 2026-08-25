@@ -105,6 +105,13 @@ function removeFromCart(id) { cart.value = cart.value.filter((entry) => entry.pe
 function toggleFavorite(id) { favoriteIds.value = favoriteIds.value.includes(id) ? favoriteIds.value.filter((item) => item !== id) : [...favoriteIds.value, id] }
 function toggleCompare(perfume) { if (compareItems.value.some((item) => item.id === perfume.id)) compareItems.value = compareItems.value.filter((item) => item.id !== perfume.id); else if (compareItems.value.length < 3) compareItems.value.push(perfume); compareOpen.value = true }
 function selectBrand(value) { brand.value = value }
+async function selectSuggestion(item) {
+  if (item.type === 'brand') { search.value = ''; brand.value = item.label; return }
+  search.value = item.perfume.name
+  selectedPerfume.value = item.perfume
+  await nextTick()
+  document.querySelector('#catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 function openRecoveredCart() { recoveredCart.value = false; cartOpen.value = true }
 const relatedPerfumes = computed(() => selectedPerfume.value ? perfumes.value.filter((item) => item.id !== selectedPerfume.value.id && (item.brand === selectedPerfume.value.brand || item.style === selectedPerfume.value.style)).slice(0, 4) : [])
 const retry = () => globalThis.location.reload()
@@ -114,7 +121,7 @@ const retry = () => globalThis.location.reload()
   <div class="min-h-screen bg-ink">
     <button v-if="recoveredCart" class="fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-full border border-gold-400/30 bg-panel px-5 py-3 text-sm shadow-2xl" @click="openRecoveredCart">Recuperamos tu carrito · Ver</button>
     <PromoBanner />
-    <Header v-model:search="search" />
+    <Header v-model:search="search" :perfumes="perfumes" @select-suggestion="selectSuggestion" />
     <main>
       <Hero />
       <BenefitsBar />
